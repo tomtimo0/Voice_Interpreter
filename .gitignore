@@ -1,6 +1,16 @@
 .env
 __pycache__/
 *.pyc
-output.wav
 work/
 try/
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.aac
+*.ogg
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
