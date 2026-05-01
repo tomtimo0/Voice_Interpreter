@@ -12,6 +12,7 @@ DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 # ASR
 WHISPER_MODEL = "whisper-1"
 ASR_LANGUAGE = "ja"
+ASR_CHUNK_SECONDS = 180  # split large audio into N-second chunks for upload
 
 # Translation
 TRANSLATE_MODEL = "deepseek-v4-pro"
@@ -20,6 +21,10 @@ TRANSLATE_MODEL = "deepseek-v4-pro"
 TTS_VOICE = "zh-CN-XiaoxiaoNeural"
 TTS_RATE = "+10%"
 TTS_PROXY = os.getenv("TTS_PROXY", "http://127.0.0.1:10808")
+try:
+    TTS_MAX_CONCURRENT = max(1, int(os.getenv("TTS_MAX_CONCURRENT", "6")))
+except ValueError:
+    TTS_MAX_CONCURRENT = 6
 
 # Mixer
 DEFAULT_DELAY = 0.3          # Chinese TTS starts at segment start + delay (seconds)
