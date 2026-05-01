@@ -16,9 +16,10 @@ ASR_LANGUAGE = "ja"
 # Translation
 TRANSLATE_MODEL = "deepseek-v4-pro"
 
-# TTS
+# TTS (Edge TTS)
 TTS_VOICE = "zh-CN-XiaoxiaoNeural"
 TTS_RATE = "+10%"
+TTS_PROXY = os.getenv("TTS_PROXY", "http://127.0.0.1:10808")
 
 # Mixer
 DEFAULT_DELAY = 0.3          # Chinese TTS starts at segment start + delay (seconds)

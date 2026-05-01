@@ -19,8 +19,13 @@ cp .env.example .env
 # 编辑 .env：LEMONFOX_API_KEY、DEEPSEEK_API_KEY
 
 # 运行
-python main.py input.mp3 -o output.wav
+python main.py input.mp4 -o output.wav
 python main.py input.mp3 -o output.wav --delay 0.5 --duck-ratio 0.25
+
+# 断点续跑
+python main.py input.mp3 -w work                 # 保存中间文件到 work/
+python main.py input.mp3 -w work --resume        # 自动检测断点继续
+python main.py input.mp3 -w work --from-stage 3  # 从 TTS 阶段开始
 ```
 
 ## 架构
@@ -42,6 +47,15 @@ main.py  →  asr.py  →  translate.py  →  tts.py  →  mixer.py
 {..., "zh_wav_path": str, "zh_duration_ms": int}  # mixer 内部
 ```
 
+### 断点续跑机制
+
+每个阶段完成后将结果写入 `-w` 指定的工作目录：
+- `stage_1_asr.json` — 识别结果
+- `stage_2_translate.json` — 翻译结果
+- `stage_3_tts.json` — TTS 结果（含 wav 文件路径）
+
+`--resume` 自动检测最新完成的阶段并继续；`--from-stage N` 手动指定起点。
+
 ## 各模块
 
 ### asr.py — `transcribe(audio_path) -> list[dict]`
@@ -51,7 +65,7 @@ Lemonfox Whisper API（OpenAI 兼容，`base_url=https://api.lemonfox.ai/v1`，`
 DeepSeek API（`deepseek-v4-pro`，OpenAI 兼容 SDK），批量日→中翻译。System prompt 要求输出口语化口译风格，结构化 JSON（`[{id, ja}] → [{id, zh}]`）。每批最多 30 段。`_parse_response` 自动处理裸 JSON 或 markdown 代码块包裹的响应。
 
 ### tts.py — `synthesize(segments, output_dir) -> list[dict]`
-Edge TTS（免费），中文语音 `zh-CN-XiaoxiaoNeural`，语速 +10%。所有 segment 通过 `asyncio.gather` 并发合成，输出独立 WAV 文件。
+Edge TTS（免费），中文语音 `zh-CN-XiaoxiaoNeural`，语速 +10%。通过本地 HTTP 代理（`TTS_PROXY` 配置项）访问 Bing Speech 服务。所有 segment 通过 `asyncio.gather` 并发合成。合成后写入 `zh_wav_path` 和 `zh_duration_ms`。
 
 ### mixer.py — `mix(audio_path, segments, output_path, delay, duck_ratio, chinese_volume)`
 pydub 音频处理。核心逻辑：
