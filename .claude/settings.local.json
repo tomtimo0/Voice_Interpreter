@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(/c/Users/86130/AppData/Local/Programs/Python/Python312/python.exe -c \"import sys; sys.path.insert\\(0, 'D:/MyProject/LLMVoiceInterpreter'\\); from config import VOXCPM_MODEL; print\\('✓ VOXCPM_MODEL:', VOXCPM_MODEL\\); from main import main; print\\('✓ main OK'\\)\")",
-      "Bash(/c/Users/86130/AppData/Local/Programs/Python/Python312/python.exe -c \"import sys; sys.path.insert\\(0, 'D:/MyProject/LLMVoiceInterpreter'\\); from config import VOXCPM_MODEL; print\\('VOXCPM_MODEL:', VOXCPM_MODEL\\); from main import main; print\\('main OK'\\)\")"
-    ]
-  }
-}

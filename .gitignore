@@ -15,3 +15,5 @@ try/
 *.avi
 *.webm
 output
+.claude/
+CLAUDE.md
