@@ -120,27 +120,30 @@ def mix(audio_path: str, segments: list[dict], output_path: str,
         volume_factors = [1.0] * len(segments)
 
     # Compute duck regions based on Chinese TTS playback
-    duck_intervals = []
-    for seg in segments:
-        if "zh_wav_path" not in seg:
-            continue
-        zh_start_ms = int((seg["start"] + delay) * 1000)
-        zh_duration_ms = seg.get("zh_duration_ms", 0)
-        if zh_duration_ms == 0:
-            zh_wav = AudioSegment.from_file(seg["zh_wav_path"])
-            zh_duration_ms = len(zh_wav)
-            seg["zh_duration_ms"] = zh_duration_ms
-        zh_end_ms = zh_start_ms + zh_duration_ms
+    if duck_ratio >= 1.0:
+        ducked = original
+    else:
+        duck_intervals = []
+        for seg in segments:
+            if "zh_wav_path" not in seg:
+                continue
+            zh_start_ms = int((seg["start"] + delay) * 1000)
+            zh_duration_ms = seg.get("zh_duration_ms", 0)
+            if zh_duration_ms == 0:
+                zh_wav = AudioSegment.from_file(seg["zh_wav_path"])
+                zh_duration_ms = len(zh_wav)
+                seg["zh_duration_ms"] = zh_duration_ms
+            zh_end_ms = zh_start_ms + zh_duration_ms
 
-        duck_start = max(0, zh_start_ms - DUCK_FADE_MS)
-        duck_end = min(total_ms, zh_end_ms + DUCK_FADE_MS)
-        duck_intervals.append((duck_start, duck_end))
+            duck_start = max(0, zh_start_ms - DUCK_FADE_MS)
+            duck_end = min(total_ms, zh_end_ms + DUCK_FADE_MS)
+            duck_intervals.append((duck_start, duck_end))
 
-    merged = _merge_intervals(duck_intervals)
-    duck_gain_db = _gain_db_from_ratio(duck_ratio)
+        merged = _merge_intervals(duck_intervals)
+        duck_gain_db = _gain_db_from_ratio(duck_ratio)
+        ducked = _build_ducked(original, merged, duck_gain_db)
+
     base_gain_db = _gain_db_from_ratio(chinese_volume)
-
-    ducked = _build_ducked(original, merged, duck_gain_db)
 
     # Overlay Chinese TTS with per-segment volume
     final = ducked

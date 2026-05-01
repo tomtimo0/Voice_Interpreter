@@ -23,8 +23,8 @@ TTS_PROXY = os.getenv("TTS_PROXY", "http://127.0.0.1:10808")
 
 # Mixer
 DEFAULT_DELAY = 0.3          # Chinese TTS starts at segment start + delay (seconds)
-DEFAULT_DUCK_RATIO = 0.30    # Original volume when ducked (0-1)
-DEFAULT_CHINESE_VOLUME = 0.90
+DEFAULT_DUCK_RATIO = 1.0     # Original volume when ducked (0-1). 1.0 = no ducking
+DEFAULT_CHINESE_VOLUME = 0.10
 FADE_IN_MS = 50
 FADE_OUT_MS = 50
 DUCK_FADE_MS = 100           # Time to fade down/up original audio

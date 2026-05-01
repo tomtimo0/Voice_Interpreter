@@ -18,14 +18,17 @@ python -m pip install -r requirements.txt
 cp .env.example .env
 # 编辑 .env：LEMONFOX_API_KEY、DEEPSEEK_API_KEY
 
-# 运行
+# 单个文件
 python main.py input.mp4 -o output.wav
-python main.py input.mp3 -o output.wav --delay 0.5 --duck-ratio 0.25
 
-# 断点续跑
-python main.py input.mp3 -w work                 # 保存中间文件到 work/
-python main.py input.mp3 -w work --resume        # 自动检测断点继续
-python main.py input.mp3 -w work --from-stage 3  # 从 TTS 阶段开始
+# 批量处理
+python main.py file1.mp4 file2.mp3               # 输出到 output/ 目录
+python main.py --input-dir ./videos               # 处理目录下所有音视频
+python main.py file1.mp4 file2.mp3 -o my_outputs  # 指定输出目录
+
+# 断点续跑（每个文件独立 work/{filename}/ 目录）
+python main.py input.mp3 -w work --resume         # 自动检测断点继续
+python main.py input.mp3 -w work --from-stage 3   # 从 TTS 阶段开始
 ```
 
 ## 架构
@@ -49,10 +52,12 @@ main.py  →  asr.py  →  translate.py  →  tts.py  →  mixer.py
 
 ### 断点续跑机制
 
-每个阶段完成后将结果写入 `-w` 指定的工作目录：
+每个文件独立存储在工作目录下：`work/{文件名}/`
+
 - `stage_1_asr.json` — 识别结果
 - `stage_2_translate.json` — 翻译结果
 - `stage_3_tts.json` — TTS 结果（含 wav 文件路径）
+- `tts_audio/` — TTS 生成的 .wav 文件
 
 `--resume` 自动检测最新完成的阶段并继续；`--from-stage N` 手动指定起点。
 
